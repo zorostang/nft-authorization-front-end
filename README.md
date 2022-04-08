@@ -1,0 +1,1 @@
+# nft-authorization-front-end
