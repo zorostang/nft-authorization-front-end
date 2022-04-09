@@ -191,7 +191,6 @@ window.onload = async () => {
   });
 
   console.log("RESPONSE", response)
-  console.log(response.length)
   document.getElementById('nfts').disabled = false;
   document.getElementById('submit').disabled = false;
   document.getElementById('nfts').innerHTML = '';
@@ -199,8 +198,6 @@ window.onload = async () => {
   for (let i = 0; i < response.length; i++){
     createOption(response[i])
   }
-
-
 
 }
 }
@@ -246,19 +243,19 @@ document.loginForm.onsubmit = async(e) => {
 
  const uint8key = Uint8Array.from(private_key);
  const message = new Uint8Array([23,65,12,87]);
- console.log(uint8key, message)
+ console.log(uint8key)
 
-  const signed = sign(uint8key, message, /*secureRandom(8, { type: "Uint8Array" })*/);
-  console.log(signed.toString())
+const signed = sign(uint8key, message, /*secureRandom(8, { type: "Uint8Array" })*/);
+console.log(signed.toString())
 
-  var params = new URLSearchParams();
-    params.append('signature', signed.toString());
-    params.append('nft_id', selected);
+var params = new URLSearchParams();
+  params.append('signature', signed.toString());
+  params.append('nft_id', selected);
 
-  const response = await axios.post(
-      `http://localhost:3001/login`,
-      params
-  );
+const response = await axios.post(
+    `http://localhost:3001/login`,
+    params
+);
 
 }
 
