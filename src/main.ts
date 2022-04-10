@@ -258,32 +258,3 @@ const response = await axios.post(
 );
 
 }
-
-//  //contract function to execute
-//  const handleMsg = {
-//   change_distribution : {
-//       dist_info: {
-//           decimal_places_in_rates: 2,
-//           royalties: [
-//               {
-//                   recipient: recipient,
-//                   rate: 100
-//               }
-//           ]
-//       },
-//   }
-// }
-
-// //execute the contract function
-// const tx = await secretjs.tx.compute.executeContract(
-//   {
-//     sender: myAddress,
-//     contract: process.env.CONTRACT_ADDRESS,
-//     msg: handleMsg
-//   },
-//   {
-//     gasLimit: 35000,
-//   },
-// );
-
-// console.log(tx);
