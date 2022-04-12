@@ -4,5 +4,31 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  /* margin-top: 60px; */
+}
+
+#success {
+  display: block;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+form {
+  padding-top: 2rem;
+}
+
+.confetti{
+  /* max-width: 640px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  user-select: none; */
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none;
 }

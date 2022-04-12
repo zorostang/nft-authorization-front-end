@@ -8,6 +8,9 @@
     <title>Vite App</title>
   </head>
   <body>
+    <div>
+      <canvas class="confetti" id="canvas"></canvas>
+    </div>
     <div id="app">
       <form name="loginForm">
         <label for="nfts">Choose an NFT:</label>
@@ -18,7 +21,11 @@
 
         <button type="submit" disabled="true" id="submit">Submit</button>
       </form>
+      <div>
+        <h2 id="success"></h2>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
+    <script src="/src/confetti.js"></script>
   </body>
 </html>

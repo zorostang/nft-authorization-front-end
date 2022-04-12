@@ -115,12 +115,12 @@ window.onload = async () => {
     } else {
         alert("Please use the recent version of keplr extension"); 
     }
+  }
 
   await window.keplr.enable(CHAIN_ID);
 
   const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(CHAIN_ID);
   [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
-  console.log(myAddress);
 
   secretjs = await SecretNetworkClient.create({
     //grpcWebUrl: "http://rpc.pulsar.griptapejs.com:9091/",
@@ -198,15 +198,13 @@ window.onload = async () => {
   for (let i = 0; i < response.length; i++){
     createOption(response[i])
   }
-
-}
 }
 
 document.loginForm.onsubmit = async(e) => {
   e.preventDefault();
   document.getElementById('submit').disabled = true;
   const selected = document.getElementById('nfts').value;
-  console.log(selected)
+  console.log(`Token ID selected: ${selected}`);
 
   //query
   const privateMetadataQuery = {
@@ -241,20 +239,26 @@ document.loginForm.onsubmit = async(e) => {
   console.log(private_key)
   document.getElementById('submit').disabled = false;
 
- const uint8key = Uint8Array.from(private_key);
- const message = new Uint8Array([23,65,12,87]);
- console.log(uint8key)
+  const uint8key = Uint8Array.from(private_key);
+  const message = new Uint8Array([23,65,12,87]);
+  console.log(uint8key)
 
-const signed = sign(uint8key, message, /*secureRandom(8, { type: "Uint8Array" })*/);
-console.log(signed.toString())
+  const signed = sign(uint8key, message, /*secureRandom(8, { type: "Uint8Array" })*/);
 
-var params = new URLSearchParams();
-  params.append('signature', signed.toString());
-  params.append('nft_id', selected);
+  var params = new URLSearchParams();
+    params.append('signature', signed.toString());
+    params.append('nft_id', selected);
 
-const response = await axios.post(
-    `http://localhost:3001/login`,
-    params
-);
-
+  const response = await axios.post(
+      `http://localhost:3001/login`,
+      params
+  );
+  console.log(`Response from express.js: ${response.data.login}, ${response.headers['content-type']}, ${response.status}`); 
+  if (response.data.login === true) {
+    document.getElementById('success').innerHTML = 'LOGIN SUCCESS';
+    document.getElementById('canvas').style = 'display: flex;';
+  }
+  else document.getElementById('success').innerHTML = 'LOGIN FAILED'
+  
 }
+

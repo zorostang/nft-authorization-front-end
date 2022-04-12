@@ -55,7 +55,7 @@ app.post('/login', async(req, res) => {
   const uint8signature = Uint8Array.from(signature.split(','));
   const verified = verify(uint8key, message, uint8signature);
   console.log(verified);
-
-  if (verified) { res.send('Login endpoint!') }
+  
+  if (verified) { res.send({ login: true }) }
   else { res.send('Invalid!') }
 })
