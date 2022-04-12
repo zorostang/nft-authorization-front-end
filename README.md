@@ -19,6 +19,7 @@ npm install
 ```text
 cp .env_example .env
 ```
+
 Update `.env` values as needed.
 
 ## Compile Front-End for Development
@@ -28,6 +29,8 @@ npm run dev
 ```
 
 ## Start Express Back-End
+
+In a new terminal:
 
 ```sh
 npm run backend
