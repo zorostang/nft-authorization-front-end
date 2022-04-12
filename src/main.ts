@@ -29,8 +29,9 @@ let myAddress: string;
 let secretjs: SecretNetworkClient;
 let signature;
 
-const contractAddress = 'secret1tk808ayrwluck5wk8nssyh6n0fcy23zm96a60m';
-const CHAIN_ID = "pulsar-2";
+const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
+const CHAIN_ID = import.meta.env.VITE_CHAIN_ID;
+
 const permitName = "nft-authorization";
 const allowedTokens = [contractAddress];
 const permissions = ["owner"];
@@ -48,66 +49,63 @@ window.onload = async () => {
   if (!window.getOfflineSigner || !window.keplr) {
     alert("Please install Keplr extension");
   } else {
-  // @ts-expect-error
-    if (window.keplr.experimentalSuggestChain) {
+    if (CHAIN_ID?.includes("pulsar") && keplr.experimentalSuggestChain) {
       try {
         // Keplr v0.6.4 introduces an experimental feature that supports the feature to suggests the chain from a webpage.
-        // cosmoshub-3 is integrated to Keplr so the code should return without errors.
-        // The code below is not needed for cosmoshub-3, but may be helpful if you’re adding a custom chain.
+        // The code below is not needed for secret-4 or other integrated chains, but may be helpful if you’re adding a custom chain.
         // If the user approves, the chain will be added to the user's Keplr extension.
         // If the user rejects it or the suggested chain information doesn't include the required fields, it will throw an error.
         // If the same chain id is already registered, it will resolve and not require the user interactions.
         // @ts-expect-error
         await window.keplr.experimentalSuggestChain({
-          // Chain-id of the Osmosis chain.
+          // Chain-id of the testnet chain.
           chainId: "pulsar-2",
           // The name of the chain to be displayed to the user.
           chainName: "Pulsar-2 Testnet",
-          // TODO RPC endpoint of the chain. In this case we are using blockapsis, as it's accepts connections from any host currently. No Cors limitations.
           rpc: "https://pulsar-2.api.trivium.network:26657",
-          // TOOD REST endpoint of the chain.
           rest: "https://pulsar-2.api.trivium.network:1317",
           stakeCurrency: {
             coinDenom: "SCRT",
             coinMinimalDenom: "uscrt",
             coinDecimals: 6,
-            coinGeckoId: "secret"
-        },
-        bip44: {
-          coinType: 529,
-            },
-            bech32Config: {
-                bech32PrefixAccAddr: "secret",
-                bech32PrefixAccPub: "secretpub",
-                bech32PrefixValAddr: "secretvaloper",
-                bech32PrefixValPub: "secretvaloperpub",
-                bech32PrefixConsAddr: "secretvalcons",
-                bech32PrefixConsPub: "secretvalconspub"
-            },
-            currencies: [{
-              coinDenom: "SCRT",
-              coinMinimalDenom: "uscrt",
-              coinDecimals: 6,
-              coinGeckoId: "secret"
-            }],
-            feeCurrencies: [{
-              coinDenom: "SCRT",
-              coinMinimalDenom: "uscrt",
-              coinDecimals: 6,
-              coinGeckoId: "secret"
-            }],
-            // (Optional) The number of the coin type.
-            // This field is only used to fetch the address from ENS.
-            // Ideally, it is recommended to be the same with BIP44 path's coin type.
-            // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
-            // So, this is separated to support such chains.
+            // coinGeckoId: "secret"
+          },
+          bip44: {
             coinType: 529,
-            // TODO determine default gas prices
-            gasPriceStep: {
-                low: 0.1,
-                average: 0.25,
-                high: 0.4
-            }
+          },
+          bech32Config: {
+            bech32PrefixAccAddr: "secret",
+            bech32PrefixAccPub: "secretpub",
+            bech32PrefixValAddr: "secretvaloper",
+            bech32PrefixValPub: "secretvaloperpub",
+            bech32PrefixConsAddr: "secretvalcons",
+            bech32PrefixConsPub: "secretvalconspub"
+          },
+          currencies: [{
+            coinDenom: "SCRT",
+            coinMinimalDenom: "uscrt",
+            coinDecimals: 6,
+            coinGeckoId: "secret"
+          }],
+          feeCurrencies: [{
+            coinDenom: "SCRT",
+            coinMinimalDenom: "uscrt",
+            coinDecimals: 6,
+            coinGeckoId: "secret"
+          }],
+          // (Optional) The number of the coin type.
+          // This field is only used to fetch the address from ENS.
+          // Ideally, it is recommended to be the same with BIP44 path's coin type.
+          // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
+          // So, this is separated to support such chains.
+          coinType: 529,
+          // These gas prices are for pulsar-2
+          gasPriceStep: {
+              low: 0.1,
+              average: 0.25,
+              high: 0.4
+          },
+          features: ["secretwasm", "ibc-go"]
         });
       } catch {
           alert("Failed to suggest the chain");
@@ -123,8 +121,7 @@ window.onload = async () => {
   [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
 
   secretjs = await SecretNetworkClient.create({
-    //grpcWebUrl: "http://rpc.pulsar.griptapejs.com:9091/",
-    grpcWebUrl: "https://pulsar-2.api.trivium.network:9091/",
+    grpcWebUrl: import.meta.env.VITE_GRPC_URL,
     chainId: CHAIN_ID,
     wallet: keplrOfflineSigner,
     walletAddress: myAddress,
@@ -183,14 +180,12 @@ window.onload = async () => {
       },
     },
   }
-  console.log("Contract: ", contractAddress)
   const { token_list: { tokens: response }} = await secretjs.query.compute.queryContract({
     contractAddress: contractAddress,
-    codeHash: "19ccaec86f94e601ba922f3a74e5d8faa2a332dbad14475382ee255e42e8e2e3",
+    codeHash: import.meta.env.VITE_CONTRACT_CODE_HASH,
     query: permitQuery
   });
 
-  console.log("RESPONSE", response)
   document.getElementById('nfts').disabled = false;
   document.getElementById('submit').disabled = false;
   document.getElementById('nfts').innerHTML = '';
@@ -204,7 +199,6 @@ document.loginForm.onsubmit = async(e) => {
   e.preventDefault();
   document.getElementById('submit').disabled = true;
   const selected = document.getElementById('nfts').value;
-  console.log(`Token ID selected: ${selected}`);
 
   //query
   const privateMetadataQuery = {
@@ -233,15 +227,13 @@ document.loginForm.onsubmit = async(e) => {
 
   const { private_metadata: { extension: { auth_key: private_key } } } = await secretjs.query.compute.queryContract({
     contractAddress: contractAddress,
-    //codeHash: '19ccaec86f94e601ba922f3a74e5d8faa2a332dbad14475382ee255e42e8e2e3',
+    codeHash: import.meta.env.VITE_CONTRACT_CODE_HASH,
     query: permitQuery,
   });
-  console.log(private_key)
   document.getElementById('submit').disabled = false;
 
   const uint8key = Uint8Array.from(private_key);
   const message = new Uint8Array([23,65,12,87]);
-  console.log(uint8key)
 
   const signed = sign(uint8key, message, /*secureRandom(8, { type: "Uint8Array" })*/);
 
@@ -250,10 +242,9 @@ document.loginForm.onsubmit = async(e) => {
     params.append('nft_id', selected);
 
   const response = await axios.post(
-      `http://localhost:3001/login`,
+      `http://localhost:${import.meta.env.VITE_PORT}/login`,
       params
   );
-  console.log(`Response from express.js: ${response.data.login}, ${response.headers['content-type']}, ${response.status}`); 
   if (response.data.login === true) {
     document.getElementById('success').innerHTML = 'LOGIN SUCCESS';
     document.getElementById('canvas').style = 'display: flex;';

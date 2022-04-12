@@ -1,14 +1,15 @@
-// import http from 'http';
 import cors from 'cors';
 import express from 'express';
+import dotenv from 'dotenv';
 import { verify } from "curve25519-js";
 import { SecretNetworkClient } from "secretjs";
+dotenv.config();
 
 const app = express()
-const port = 3001
-const CHAIN_ID = "pulsar-2";
-const GRPC_URL = "https://pulsar-2.api.trivium.network:9091/"
-const contractAddress = 'secret1tk808ayrwluck5wk8nssyh6n0fcy23zm96a60m';
+const port = process.env.VITE_PORT;
+const CHAIN_ID = process.env.VITE_CHAIN_ID;
+const GRPC_URL = process.env.VITE_GRPC_URL;
+const contractAddress = process.env.VITE_CONTRACT_ADDRESS;
 
 //query client
 const secretjs = await SecretNetworkClient.create({
@@ -21,13 +22,12 @@ app.use(express.static('src'))
   .use(cors());
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Listening on port ${port}`)
 })
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
-
 
 app.post('/login', async(req, res) => {
   console.log(req.body);
@@ -46,7 +46,7 @@ app.post('/login', async(req, res) => {
   
   const { nft_info: { extension: { auth_key: public_key }}} = await secretjs.query.compute.queryContract({
     contractAddress: contractAddress,
-    //codeHash: '19ccaec86f94e601ba922f3a74e5d8faa2a332dbad14475382ee255e42e8e2e3',
+    codeHash: process.env.VITE_CONTRACT_CODE_HASH,
     query: publicMetadataQuery,
   });
 
